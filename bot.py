@@ -1,5 +1,5 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, CallbackContext
+from telegram.ext import Updater, CommandHandler, CallbackContext
 import sqlite3
 import random
 
@@ -102,14 +102,16 @@ def recipe(update: Update, context: CallbackContext):
     cursor = conn.cursor()
     dish_name = ' '.join(context.args).lower()
     tables = ['breakfast', 'first', 'second', 'snacks', 'drinks']
-    result = None
+    message = ''
     for i in tables:
         cursor.execute(f"SELECT url FROM {i} WHERE dish=?", (dish_name,))
         result = cursor.fetchone()
         if result:
-            update.message.reply_text(f'Рецепт для приготовления блюда "{dish_name.capitalize()}": {result[0]}')
-    if not result:
+            message = f'Рецепт для приготовления блюда "{dish_name.capitalize()}": {result[0]}'
+    if not message:
         update.message.reply_text("Хмм... Я такое блюдо не знаю...")
+    else:
+        update.message.reply_text(message)
     conn.close()
 
 
